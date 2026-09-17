@@ -1,0 +1,44 @@
+# EDA 결과 요약
+
+대상: `data/raw/facility_safety_20260917.csv` (TODZ_API_FACI_SAFETY, 98,551행). 생성 스크립트: `src/eda.py` / 그림: `outputs/figures/eda/`. 기준일: 2026-09-17.
+
+## 1. 데이터 개요
+- 전체 98,551건, 운영상태 정상운영 72.9%, 폐업/휴업/운영폐쇄 27.1%
+- 시설구분: 신고업 89.0%, 공공 10.5%, 등록업 0.6%
+- ![데이터 개요](outputs/figures/eda/01_overview.png)
+
+## 2. 타겟 변수
+- 점검 이력 있는 시설: 65,440건 / 라벨 결측: 33,111건(33.6%)
+- **전체 위험군(주의+사용중지) 비율: 3.85%** — 이진분류 기준 심각한 클래스 불균형
+- 정상운영 시설만(n=71,842) 봐도 라벨 결측 23.3% — 폐업 시설만의 문제가 아님
+- ![타겟 변수](outputs/figures/eda/02_target.png)
+
+## 3. 범주형 피처 분포
+- ![범주형 분포](outputs/figures/eda/03_categorical.png)
+
+## 4. 범주별 위험 비율 (핵심 인사이트)
+업종 Top5 (표본 30건 이상 중 위험 비율 최고):
+  - 빙상장: 33.3% (n=33)
+  - 사격장: 30.0% (n=30)
+  - 육상경기장: 24.8% (n=246)
+  - 수영장: 24.2% (n=483)
+  - 골프장업: 22.2% (n=508)
+시도 Top5:
+  - 세종특별자치시: 10.6% (n=595)
+  - 서울특별시: 6.3% (n=7,420)
+  - 대전광역시: 5.7% (n=1,474)
+  - 충청북도: 5.5% (n=2,469)
+  - 전남광주통합특별시: 5.0% (n=4,283)
+- ![위험 비율](outputs/figures/eda/04_risk_rate_by_category.png)
+
+## 5~6. 수치형 피처
+- 시설연령 중앙값: 정상 8.3년 vs 위험군 9.7년
+- 점검경과일수 중앙값: 정상 189일 vs 위험군 163일
+- ![수치형 분포](outputs/figures/eda/05_numeric_distributions.png)
+- ![수치형 vs 타겟](outputs/figures/eda/06_numeric_vs_target.png)
+
+## 7. 결측치 패턴
+- ![결측치 패턴](outputs/figures/eda/07_missing_pattern.png)
+
+## 8. 상관관계
+- ![상관관계](outputs/figures/eda/08_correlation.png)

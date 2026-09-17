@@ -25,3 +25,6 @@ __pycache__/
 .DS_Store
 Thumbs.db
 .vscode/settings.json
+
+# 로컬 전용 (레포에는 올리지 않음)
+docs/presentation_script.md

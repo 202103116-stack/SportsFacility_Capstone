@@ -47,7 +47,9 @@ def fetch_page(base_endpoint: str, operation: str, page_no: int, num_of_rows: in
     }
     res = requests.get(url, params=params, timeout=30)
     res.raise_for_status()
-    return res.json()
+    payload = res.json()
+    # 공공데이터포털 표준 응답은 최상위가 {"response": {"header":..., "body":...}}로 감싸져 있음
+    return payload.get("response", payload)
 
 
 def extract_items(payload: dict) -> list:

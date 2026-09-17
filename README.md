@@ -28,6 +28,7 @@ SportsFacility_Capstone/
 ## 데이터 소스
 
 `docs/data_sources.md` 참고 — 지금까지 조사·검증한 모든 데이터셋/오픈API 목록과 검증 결과가 정리되어 있음.
+컬럼 단위 상세 정의·실측 통계·데이터 품질 이슈는 `docs/data_dictionary.md` 참고.
 
 ## 환경 설정
 
