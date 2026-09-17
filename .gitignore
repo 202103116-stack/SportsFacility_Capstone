@@ -1,0 +1,27 @@
+# 환경/보안
+.env
+*.env
+.venv/
+venv/
+
+# 데이터 (용량 크고 원본은 공유 안 함 - 팀원끼리는 별도 공유)
+data/raw/*
+data/processed/*
+data/external/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/external/.gitkeep
+
+# 모델 아티팩트
+models/*
+!models/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS/에디터
+.DS_Store
+Thumbs.db
+.vscode/settings.json
