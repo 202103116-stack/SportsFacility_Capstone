@@ -34,7 +34,13 @@ plt.rcParams["axes.unicode_minus"] = False
 plt.rcParams["figure.dpi"] = 110
 
 
+PINNED_SNAPSHOT = "facility_safety_20260917.csv"  # 최신 파일 자동 선택 시 문서 수치와 어긋나므로 src/preprocess.py와 같은 스냅샷으로 고정
+
+
 def latest_safety_csv() -> Path:
+    pinned = ROOT / "data" / "raw" / PINNED_SNAPSHOT
+    if pinned.exists():
+        return pinned
     files = sorted(glob.glob(str(ROOT / "data" / "raw" / "facility_safety_*.csv")))
     if not files:
         raise FileNotFoundError("data/raw/facility_safety_*.csv 없음 — src/fetch_facility_data.py --target safety 먼저 실행")
@@ -163,7 +169,9 @@ def fig_target(df: pd.DataFrame):
     ax = axes[1, 0]
     ct = pd.crosstab(df["faci_stat_nm"], df["grade_raw"].isna().map({True: "라벨 결측", False: "라벨 있음"}))
     ct = ct.reindex(["정상운영", "폐업", "휴업", "운영폐쇄"])
-    ct.plot(kind="bar", stacked=True, ax=ax, color=["#4C9F70", "#D1495B"])
+    # 오른쪽 파이차트의 초록/빨강(정상/위험군)과 겹치지 않도록 별도 팔레트 사용.
+    # "라벨 결측" 색은 오른쪽 파이차트의 "미점검(결측)" 회색과 의도적으로 맞춤.
+    ct.plot(kind="bar", stacked=True, ax=ax, color=["#B0B0B0", "#4C72B0"])
     ax.set_title("운영상태별 라벨 결측 여부")
     ax.set_xlabel("")
     ax.set_ylabel("시설 수")

@@ -30,6 +30,11 @@ SportsFacility_Capstone/
 `docs/data_sources.md` 참고 — 지금까지 조사·검증한 모든 데이터셋/오픈API 목록과 검증 결과가 정리되어 있음.
 컬럼 단위 상세 정의·실측 통계·데이터 품질 이슈는 `docs/data_dictionary.md` 참고.
 
+## 진행 기록
+
+- `docs/WORKFLOW.md`: 9단계 워크플로우와 단계별 진행 상태
+- `docs/decision_log.md`: 방법 선택의 이유와 최종 결정(근거 수치), 정정 기록, 다음 단계 — Notion 진행 기록과 동일 내용
+
 ## 환경 설정
 
 ```powershell
@@ -38,6 +43,8 @@ python -m venv .venv
 pip install -r requirements.txt
 copy .env.example .env   # 이후 .env에 발급받은 인증키 직접 입력
 python src\fetch_facility_data.py --target safety
+python src\preprocess.py        # data/processed/facility_safety_features_20260917.csv 생성 (스냅샷 09-17 고정)
+python src\train_baseline.py    # 베이스라인 검증 → outputs/reports/baseline_metrics.csv
 ```
 
 - 시스템에 Python 버전이 여러 개 있다면 `.venv`가 없는 기본 `python`/`py`는 패키지가

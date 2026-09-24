@@ -16,8 +16,9 @@
 **전국 체육시설 안전점검 데이터를 활용한 시설 안전위험 예측 및 점검자원 우선순위 최적화**
 
 핵심 스토리 흐름 (세 단계를 하나로 엮어서 진행):
-1. **예측**: 시설 특성(업종, 시설유형, 지역, 면적, 시설연령, 마지막 점검 이후 경과일수 등)으로
-   안전위험군을 예측하는 분류 모델을 만든다. **(EDA로 확정된 타겟 정의: 이진분류 —
+1. **예측**: 시설 특성(업종, 시설유형, 지역, 면적, 시설연령 등 점검 전에 관측되는 값만)으로
+   안전위험군을 예측하는 분류 모델을 만든다. (점검일·경과일수는 예측 대상에서 결측이라 사용 불가 —
+   "마지막 점검 후 경과일"은 점검 이력 패널을 쓰는 Option B에서만 가능, `docs/WORKFLOW.md` §3·§5) **(EDA로 확정된 타겟 정의: 이진분류 —
    양호=0 vs 위험군(주의+사용중지)=1. "수리필요" 등급은 실제 데이터에 존재하지 않고,
    `사용중지`는 전국 23건뿐이라 3-클래스 분류가 불가능함을 확인 — `docs/eda_findings.md` §2,
    `docs/WORKFLOW.md` §1 참고.)**
@@ -26,7 +27,8 @@
 3. **검증**: 스포츠안전사고 통계(스포츠안전재단)와 교차검증해서, 모델이 위험하다고 예측한
    업종/지역이 실제 사고 통계 경향과 방향이 맞는지 확인한다.
 
-전체 워크플로우(문제정의~모니터링 9단계)와 각 단계별 진행 상태는 `docs/WORKFLOW.md` 참고.
+전체 워크플로우(문제정의~모니터링 9단계)와 각 단계별 진행 상태는 `docs/WORKFLOW.md`, 방법 선택의 이유와
+최종 결정은 `docs/decision_log.md` 참고.
 특히 `TODZ_API_FACI_SAFETY`가 시설당 "최신 점검 1건"만 제공한다는 구조적 한계 때문에
 "예측"이라는 표현을 쓸 때 범위를 어떻게 정직하게 좁혀야 하는지가 `docs/WORKFLOW.md` §3에
 정리되어 있음 — 모델링 단계 진입 전 반드시 확인.
@@ -89,13 +91,19 @@ docs               데이터 출처, 계획서, 회의록
 1. ~~데이터 전체 수집~~ ✅ (`data/raw/facility_safety_20260917.csv`, 98,551건)
 2. ~~EDA — 결측치/이상치/타겟 분포 확인~~ ✅ (`docs/eda_findings.md`, `notebooks/01_eda.ipynb`,
    `outputs/figures/eda/`)
-3. **다음 단계: Validation design** — stratified split/k-fold 설계 (`docs/WORKFLOW.md` §4)
-4. 전처리/피처엔지니어링 — `src/preprocess.py`(예정), `docs/data_dictionary.md` §4의 품질
-   이슈 반영
-5. 모델링 — baseline(로지스틱) → 트리 기반 앙상블, Recall/Precision/F1/PR-AUC 우선
+3. ~~Validation design~~ 설계 확정, 구현 대기 — 위험군×점검트랙 층화 5-fold, 트랙 구분 없는 통합
+   단일 모델, 트랙별 성능 별도 보고 (`docs/WORKFLOW.md` §4)
+4. ~~전처리/피처 선별~~ ✅ `src/preprocess.py` → `data/processed/facility_safety_features_20260917.csv`
+   (정상운영 71,842건). `atnm_chk_yn`은 피처 제외(평가용 트랙 변수로만 사용)
+5. ~~베이스라인~~ ✅ `src/train_baseline.py` — 로지스틱 자율 트랙 PR-AUC 0.119(기준선 0.019), 시군구가 결정적 신호.
+   **다음 단계: 트리 앙상블 + 시군구 신호 검증(GroupKFold)** (`docs/WORKFLOW.md` §5·§6)
 6. 자원배분 최적화 — 예측 위험도 기반 점검 우선순위 스코어링 로직 설계
 7. 검증 — 스포츠안전사고 통계와 교차검증
 8. 발표자료/보고서 정리 (`docs/presentation_script.md`, `outputs/reports/`)
+
+**현재 방침**: Option A(현재 시설 속성 기반 위험도 추정)만 진행하고, Option B(점검 이력 패널 기반
+미래예보)는 보류 중이다 — 관련 데이터(`safety_check_history_*.csv`, `self_check_history_*.csv`)는
+`data/raw/`에 받아두었고 근거·수치는 `docs/WORKFLOW.md` §3 참고.
 
 `faci_cd` 기준 `TODZ_API_SFMS_FACI` 조인은 필수 경로가 아님 — 샘플 검증 결과 핵심 예측
 피처가 이미 `TODZ_API_FACI_SAFETY`에 포함되어 있어 EDA 단계에서는 조인 없이 진행함.

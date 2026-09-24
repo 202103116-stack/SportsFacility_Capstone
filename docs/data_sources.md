@@ -44,3 +44,16 @@
 
 - 인증키(서비스키)와 두 엔드포인트(`DATA_GO_KR_SERVICE_KEY`, `FACILITY_INFO_ENDPOINT`, `FACILITY_SAFETY_ENDPOINT`)는 `.env` 파일로 관리하고 **절대 git에 커밋하지 않음** (`.gitignore`에 등록됨)
 - 페이지네이션: `totalCount`를 먼저 확인 후 `pageNo`를 반복 호출해서 전체 수집 → `data/raw/`에 스냅샷 CSV로 저장 → 이후 분석은 이 스냅샷 기준으로 진행(재현성 확보)
+- 공식 갱신주기는 데이터셋 페이지에 명시되어 있지 않지만, 실제 데이터는 거의 매일 갱신된다(수집 하루 전 날짜의 수정 기록이 존재). 그래서 한 시점의 스냅샷으로 고정해서 쓴다.
+- 응답 JSON은 `{"response": {"header": ..., "body": ...}}`로 한 겹 감싸져 있다(`src/fetch_facility_data.py`가 처리).
+
+## 수집한 스냅샷 (`data/raw/`, git 미추적)
+
+| 파일 | 원천 | 행 수 | 용도 |
+|---|---|---|---|
+| `facility_safety_20260917.csv` | `TODZ_API_FACI_SAFETY` | 98,551 | **분석 기준 스냅샷(고정)**. `src/preprocess.py`·`src/eda.py`가 이 파일을 읽음 |
+| `facility_safety_20260924.csv` | 〃 | 98,640 | 재수집 비교용(신규 시설 91개, 라벨 전환 0건 확인). 분석에는 쓰지 않음 |
+| `safety_check_history_20260917.csv` | `TODZ_API_FACI_SCHK`(공식점검 이력) | 267,694 | Option B(보류) 및 라벨 출처 확인용 |
+| `self_check_history_20260925.csv` | `TODZ_API_FACI_ATNM`(자율점검 이력) | 480,443 | 〃. 기록의 46.2%는 등급 공란 |
+
+SAFETY 등급의 출처(공식점검 vs 자율점검)와 이력 커버리지는 `docs/data_dictionary.md` §6, 의사결정 근거는 `docs/decision_log.md` 참고.
