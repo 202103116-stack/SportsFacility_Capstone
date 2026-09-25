@@ -16,6 +16,9 @@ data/external/*
 models/*
 !models/.gitkeep
 
+# CatBoost 학습 로그
+catboost_info/
+
 # Python
 __pycache__/
 *.pyc

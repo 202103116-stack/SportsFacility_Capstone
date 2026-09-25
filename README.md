@@ -45,6 +45,11 @@ copy .env.example .env   # 이후 .env에 발급받은 인증키 직접 입력
 python src\fetch_facility_data.py --target safety
 python src\preprocess.py        # data/processed/facility_safety_features_20260917.csv 생성 (스냅샷 09-17 고정)
 python src\train_baseline.py    # 베이스라인 검증 → outputs/reports/baseline_metrics.csv
+python src\train_models.py      # 트리 모델·중첩 튜닝·3종 검증(약 15분) → outputs/reports/model_metrics.csv
+python src\compare_ab.py        # 지역 포함(A) vs 제외(B) 비교(약 15분) → outputs/reports/ab_comparison.csv
+python -u src\compare_boosters.py  # LightGBM·CatBoost 비교(약 20분) → outputs/reports/booster_comparison.csv
+python src\score_unlabeled.py   # 라벨 없는 시설 점수 산출 → data/processed/priority_scores_20260917.csv
+python src\compare_priority_options.py  # 우선순위 왜곡 완화 방안 비교 → outputs/reports/priority_option_comparison.csv
 ```
 
 - 시스템에 Python 버전이 여러 개 있다면 `.venv`가 없는 기본 `python`/`py`는 패키지가
